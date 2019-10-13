@@ -1,0 +1,7 @@
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name">Goofy Converter</string>
+    <string name="app_title">Converter</string>
+
+</resources>
