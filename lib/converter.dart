@@ -31,13 +31,13 @@ class _ConverterState extends State<Converter> {
   final _textController = TextEditingController();
   TextSelection _textSelection;
 
-  Unit _valueFrom;
-  Unit _valueTo;
+  Unit _valueFrom,
+       _valueTo;
   double _inputValue;
-  String _inputValueStr = '';
-  String _convertedValue = '';
-  bool _isEmptyInput = true;
-  bool _isInputError = false;
+  String _inputValueStr = '',
+         _convertedValue = '';
+  bool _isEmptyInput = true,
+       _isInputError = false;
 
   FocusNode _focusNode;
 
@@ -230,11 +230,9 @@ class _ConverterState extends State<Converter> {
         key: ValueKey(_inputValueStr),
         onTap: _isInputError || _isEmptyInput ? null : () {},
         onLongPress: _isInputError || _isEmptyInput ? null : () {
-          Clipboard.setData(ClipboardData(text: _convertedValue));
+          copyToClipboard(_convertedValue, context, 'Copied!');
         },
-        child: _isInputError || _isEmptyInput
-            ? outputText
-            : Tooltip(child: outputText, message: "Copied!")
+        child: outputText
       ),
     );
 

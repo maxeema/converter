@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'ext.dart';
 
@@ -18,3 +19,16 @@ toFittedBox(Widget widget, [ fit = BoxFit.scaleDown]) =>
     child: widget,
     fit: fit,
   );
+
+toast(BuildContext ctx, String msg) {
+  final theme = Theme.of(ctx);
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIos: 1,
+      backgroundColor: Colors.white.withAlpha(0xdd),
+      textColor: Colors.black87,
+      fontSize: theme.accentTextTheme.body1.fontSize
+  );
+}

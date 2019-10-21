@@ -1,14 +1,23 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import 'ext.dart';
 import 'glob.dart' as glob;
+import 'ui.dart';
 
 bool isEmpty(String s) => s?.trim()?.isEmpty ?? true;
+
+copyToClipboard(String text, BuildContext ctx, String toastMsg) {
+  Clipboard.setData(ClipboardData(text: text));
+//  print('Copied to clipboard: $text');
+  if (toastMsg != null && ctx != null)
+    toast(ctx, toastMsg);
+}
 
 showAbout(BuildContext context) =>
   PackageInfo.fromPlatform().then((PackageInfo info) {
