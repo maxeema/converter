@@ -1,6 +1,6 @@
 # Flutter Goofy Converter
 
-A sample Goofy unit converter app created on Dart/Flutter for education purposes.
+A weird Goofy unit converter app written on Flutter/Dart.
 
 Made by taking Udacity course [Build Native Mobile Apps with Flutter](https://www.udacity.com/course/ud905).
 
