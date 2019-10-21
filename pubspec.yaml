@@ -1,6 +1,6 @@
 name: goofy_converter
 description: A weird Goofy unit converter app written on Flutter/Dart.
-version: 0.0.1+1
+version: 0.5.1+2
 authors:
   - Maxeem (America) Shemetov <maxeem.america@gmail.com>
 repository: https://github.com/maxeema/flutter-goofy-converter
