@@ -1,19 +1,14 @@
-# Goofy Converter
+# Converter
 
-A weird unit converter app written on Flutter/Dart.
+Converter is a unit converter app created with Flutter
 
 Made by taking Udacity course [Build Native Mobile Apps with Flutter](https://www.udacity.com/course/ud905).
 
 On Play Store [play.google.com/store/apps/details?id=maxeem.america.flutter.converter](https://play.google.com/store/apps/details?id=maxeem.america.flutter.converter)
 
-## Screenshots
+![Screenshot](screens/Converter1.png) ![Screenshot](screens/Converter2.png)
 
-![Screenshot1](screenshots/flutter-goofy-converter-1.png)
-
-![Screenshot2](screenshots/flutter-goofy-converter-2.png)
+![Screenshot](screens/Converter5.png) ![Screenshot](screens/Converter4.png)
 
 
-
-
-
-
+© iMax (Maxeem) Shemetov, 2020
