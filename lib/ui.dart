@@ -26,9 +26,9 @@ toast(BuildContext ctx, String msg) {
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
-      timeInSecForIos: 1,
+      timeInSecForIosWeb: 1,
       backgroundColor: Colors.white.withAlpha(0xdd),
       textColor: Colors.black87,
-      fontSize: theme.accentTextTheme.body1.fontSize
+      fontSize: theme.accentTextTheme.bodyText2.fontSize
   );
 }

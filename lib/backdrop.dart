@@ -3,12 +3,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 
-import 'category.dart';
+import 'about_dialog.dart';
+import 'conf.dart' as conf;
 import 'ext.dart';
-import 'glob.dart' as glob;
-import 'util.dart' as util;
+import 'state.dart';
 
 const _flingVelocity = 2.0;
 
@@ -16,14 +17,12 @@ class _BackdropPanel extends StatelessWidget {
 
   const _BackdropPanel({
     Key key,
-    this.category,
     this.onTap,
     this.onVerticalDragUpdate,
     this.onVerticalDragEnd,
     this.child,
   }) : super(key: key);
 
-  final Category category;
   final VoidCallback onTap;
   final GestureDragUpdateCallback onVerticalDragUpdate;
   final GestureDragEndCallback onVerticalDragEnd;
@@ -32,7 +31,7 @@ class _BackdropPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
     Material(
-      color: glob.appColor.shade500,
+      color: conf.backgroundColor,
       elevation: 2.0,
       clipBehavior: Clip.antiAlias,
       borderRadius: BorderRadius.only(
@@ -48,7 +47,7 @@ class _BackdropPanel extends StatelessWidget {
             onVerticalDragEnd: onVerticalDragEnd,
             onTap: onTap,
             child: Container(
-              height: glob.backdropHeaderSize,
+              height: conf.backdropHeaderSize,
             ),
           ),
           Expanded(
@@ -108,27 +107,21 @@ class _BackdropTitle extends AnimatedWidget {
 /// can make a selection. The user can also configure the titles for when the
 /// front or back panel is showing.
 class Backdrop extends StatefulWidget {
-  final Category category;
+
   final Widget frontPanel;
   final Widget backPanel;
   final Widget frontTitle;
   final Widget backTitle;
-  final ChangeNotifier categoryNotifier;
 
   Backdrop({
-    @required this.category,
     @required this.frontPanel,
     @required this.backPanel,
     @required this.frontTitle,
     @required this.backTitle,
-    @required this.categoryNotifier,
-  })  : assert(category != null),
-        assert(frontPanel != null),
+  }) : assert(frontPanel != null),
         assert(backPanel != null),
         assert(frontTitle != null),
-        assert(backTitle != null),
-        assert(categoryNotifier != null);
-
+        assert(backTitle != null);
 
   _BackdropState createState() {
     return _BackdropState();
@@ -142,26 +135,39 @@ class _BackdropState extends State<Backdrop>
   final GlobalKey _backdropKey = GlobalKey(debugLabel: 'Backdrop');
   AnimationController _controller;
 
+  AppState appState = GetIt.I.get<AppState>();
+
   @override
   void initState() {
     super.initState();
-    widget.categoryNotifier.removeListener(_toggleBackdropPanelVisibility);
-    widget.categoryNotifier.addListener(_toggleBackdropPanelVisibility);
+    appState.opened.addListener(onOpenedState);
     // This creates an [AnimationController] that can allows for animation for
     // the BackdropPanel. 0.00 means that the front panel is in "tab" (hidden)
     // mode, while 1.0 means that the front panel is open.
     _controller = AnimationController(
       duration: mil(300),
-      value: 1.0,
+      value: 0,
       vsync: this,
     );
+    _controller.addStatusListener(animationChanged);
   }
-
+  animationChanged(AnimationStatus status) {
+    print(status);
+    if (status == AnimationStatus.dismissed) {
+        appState.opened.value = false;
+    }
+  }
+  onOpenedState() {
+    if (appState.opened.value)
+      _controller.animateTo(1);
+    if (!appState.opened.value && _controller.status != AnimationStatus.dismissed)
+      _controller.animateTo(0);
+  }
 
   @override
   void dispose() {
+    appState.opened.removeListener(onOpenedState);
     _controller.dispose();
-    widget.categoryNotifier.removeListener(_toggleBackdropPanelVisibility);
     super.dispose();
   }
 
@@ -208,14 +214,14 @@ class _BackdropState extends State<Backdrop>
   }
 
   Widget _buildStack(BuildContext context, BoxConstraints constraints) {
-    const double panelTitleHeight = glob.backdropHeaderSize;
+    const double panelTitleHeight = conf.backdropHeaderSize;
     final Size panelSize = constraints.biggest;
     final double panelTop = panelSize.height - panelTitleHeight;
 
     Animation<RelativeRect> panelAnimation = RelativeRectTween(
       begin: RelativeRect.fromLTRB(
           0.0, panelTop, 0.0, panelTop - panelSize.height),
-      end: RelativeRect.fromLTRB(0.0, glob.backdropHeaderOffset, 0.0, 0.0),
+      end: RelativeRect.fromLTRB(0.0, conf.backdropHeaderOffset, 0.0, 0.0),
     ).animate(_controller.view);
 
     return Container(
@@ -227,7 +233,6 @@ class _BackdropState extends State<Backdrop>
           PositionedTransition(
             rect: panelAnimation,
             child: _BackdropPanel(
-              category: widget.category,
               onTap: _backdropPanelVisible ? null : _toggleBackdropPanelVisibility,
               onVerticalDragUpdate: _handleDragUpdate,
               onVerticalDragEnd: _handleDragEnd,
@@ -244,22 +249,36 @@ class _BackdropState extends State<Backdrop>
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        leading: IconButton(
-          onPressed: _toggleBackdropPanelVisibility,
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.close_menu,
-            progress: _controller.view,
-          ),
+        leading: ValueListenableBuilder<bool>(
+          valueListenable: appState.opened,
+          child: Center(child: Icon(Icons.menu)),
+          builder: (ctx, opened, widget) {
+            return AnimatedSwitcher(
+              duration: mil(300),
+              child: IconButton(
+                icon: Opacity(opacity: opened ? 1 : 0.25, child: widget),
+                onPressed: opened ? _toggleBackdropPanelVisibility : null,
+              ),
+            );
+          },
         ),
+//        leading: IconButton(
+//          onPressed: _toggleBackdropPanelVisibility,
+//          icon: AnimatedIcon(
+//            icon: AnimatedIcons.close_menu,
+//            progress: _controller.view,
+//          ),
+//        ),
         title: _BackdropTitle(
           listenable: _controller.view,
           frontTitle: widget.frontTitle,
           backTitle: widget.backTitle,
         ),
+        centerTitle: false,
         actions: <Widget>[
           IconButton(
             icon:Icon(Icons.info_outline, color: Colors.white54,),
-            onPressed: ()=> util.showAbout(context)
+            onPressed: ()=> showAbout(context)
           )
         ],
       ),

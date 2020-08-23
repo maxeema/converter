@@ -6,27 +6,28 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:get_it/get_it.dart';
+import 'package:websafe_svg/websafe_svg.dart';
 import 'category.dart';
 import 'ext.dart';
-import 'glob.dart' as glob;
+import 'conf.dart' as conf;
 import 'localization.dart';
+import 'state.dart';
 import 'ui.dart' as ui;
 import 'util.dart';
 
 const _inputMaxLength = 127;
 
 class Converter extends StatefulWidget {
-  final Category category;
-
-  const Converter(this.category) : assert(category != null);
 
   @override
   _ConverterState createState() => _ConverterState();
 }
 
 class _ConverterState extends State<Converter> {
+
+  AppState appState = GetIt.I.get<AppState>();
+  Category get category => appState.category.value;
 
   final _textController = TextEditingController();
   TextSelection _textSelection;
@@ -44,31 +45,23 @@ class _ConverterState extends State<Converter> {
   @override
   initState() {
     super.initState();
-    _setDefaults();
+    appState.category.addListener(onCategoryChanged);
     _focusNode = FocusNode();
   }
-
   @override
   dispose() {
+    appState.category.removeListener(onCategoryChanged);
     _focusNode.dispose();
     super.dispose();
   }
-
-  @override
-  didUpdateWidget(Converter old) {
-    super.didUpdateWidget(old);
-    _focusNode.unfocus();
-    if (old.category != widget.category) {
-      _setDefaults();
-    }
+  onCategoryChanged() {
+    _setDefaults();
   }
-
   _setDefaults() {
-    setState(() {
-      _valueFrom = widget.category.units[0];
-      _valueTo = widget.category.units[1];
-      _resetState();
-    });
+    _valueFrom = category.units[0];
+    _valueTo = category.units[1];
+    _resetState();
+    setState(() {});
   }
 
   _resetState() {
@@ -123,6 +116,7 @@ class _ConverterState extends State<Converter> {
   }
 
   _updateInput(String input) {
+    appState.input.value = input;
     setState(() {
       if (input?.isEmpty ?? true) {
         _resetState();
@@ -142,7 +136,7 @@ class _ConverterState extends State<Converter> {
   }
 
   _getUnitByName(String name) =>
-      widget.category.units.firstWhere((unit) => unit.name == name);
+      category.units.firstWhere((unit) => unit.name == name);
 
   _updateConversionFrom(dynamic unitName) {
     setState(() {
@@ -162,6 +156,9 @@ class _ConverterState extends State<Converter> {
 
   @override
   Widget build(BuildContext context) {
+    if (category == null)
+      return SizedBox.shrink();
+
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     _textController.value = TextEditingValue(
@@ -177,8 +174,8 @@ class _ConverterState extends State<Converter> {
       showCursor: true,
       autofocus: true,
       textAlign: TextAlign.center,
-      cursorColor: glob.appColor.shade200,
-      style: Theme.of(context).textTheme.display2.apply(
+      cursorColor: Colors.white,
+      style: Theme.of(context).textTheme.headline3.apply(
         color: _isInputError ? Colors.red.shade500 : Colors.white,
         fontSizeFactor: 0.8,
       ),
@@ -190,6 +187,8 @@ class _ConverterState extends State<Converter> {
             fontSizeFactor: 1.2,
             color: Colors.white
         ),
+//        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+//        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white38)),
         enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
       ),
@@ -216,8 +215,8 @@ class _ConverterState extends State<Converter> {
         fontSizeFactor:
         _isInputError || isEmpty(_convertedValue) ? .7 : 1,
         color: _isInputError || isEmpty(_convertedValue)
-            ? Colors.white.withAlpha(0x99)
-            : Colors.white.withAlpha(0xee),
+            ? conf.accentColor3.withAlpha(0x99)
+            : conf.accentColor3,
       )
     );
     final output = AnimatedSwitcher(
@@ -407,7 +406,7 @@ class _ConverterState extends State<Converter> {
           SizedBox(width: 8,),
           Expanded(
             flex:1,
-            child: _IconRotationWidget(widget.category.icon),
+            child: _IconRotationWidget(category.icon),
           ),
           SizedBox(
             width: 24,
@@ -422,10 +421,13 @@ class _ConverterState extends State<Converter> {
                 ),
                 child: ui.toFittedBox(
                   Text(
-                    widget.category.name,
-                    style: TextStyle(fontWeight: FontWeight.w200),
+                    category.name,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        color: conf.accentColor1
+                    ),
                   )
-                ),
+                )
               )
             ),
           ),
@@ -441,7 +443,7 @@ class _ConverterState extends State<Converter> {
           SizedBox(
             width: 8,
           ),
-          _IconRotationWidget(widget.category.icon),
+          _IconRotationWidget(category.icon),
           SizedBox(
             width: 48,
           ),
@@ -450,7 +452,7 @@ class _ConverterState extends State<Converter> {
               color: Colors.white70,
             ),
             child: Text(
-              widget.category.name,
+              category.name,
               style: TextStyle(fontWeight: FontWeight.w200),
             ),
           ),
@@ -481,7 +483,7 @@ class _ConverterState extends State<Converter> {
           onChanged: onChanged,
           icon: SizedBox(),
           selectedItemBuilder: (context) =>
-            List.of(widget.category.units.map((unit) {
+            List.of(category.units.map((unit) {
               final icon = Icon(
                 isLandscape ? Icons.arrow_drop_down
                   : isTo ? Icons.arrow_drop_down : Icons.arrow_drop_up,
@@ -501,23 +503,57 @@ class _ConverterState extends State<Converter> {
                   isLandscape && isTo
                     ? <Widget>[text, icon,] : [icon, text],
               );
-              return ui.toFittedBox(row);
+              return Center(child: row);
             })
           ),
-          items: List.of(widget.category.units.map((unit) {
+          items: List.of(category.units.map((unit) {
             return DropdownMenuItem(
               value: unit.name,
-              child: Text(
-                unit.name,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.fade,
-                style: Theme.of(context).textTheme.subhead,
+              child: Center(
+                child: Text(
+                  unit.name,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
+                  style: Theme.of(context).textTheme.subhead,
+                ),
               ));
           }
         )
       )),
     ),
   );
+
+//  _createDropdown(Unit unit, isTo, bool isLandscape, ValueChanged onChanged)
+//  => InkWell(
+//    onTap: () {
+//      final newUnit = category.units.last == unit
+//          ? category.units.first
+//          : category.units[category.units.indexOf(unit)+1];
+//      onChanged(newUnit.name);
+//    },
+//    onLongPress: unit.hasDescription ? () {
+//      ui.showSnack(context, unit.description, 5);
+//    }: null,
+//    child: CupertinoPicker(
+//      scrollController: FixedExtentScrollController(initialItem: category.units.indexOf(unit)),
+//      key: ValueKey(unit.name),
+//      itemExtent: 50,
+//      looping: true,
+//      children: category.units.map((item) => Center(
+//        child: Text(
+//          item.name,
+//          overflow: TextOverflow.fade,
+//          style: Theme.of(context).textTheme.subtitle1.copyWith(
+//              fontWeight: unit == item ? FontWeight.bold : FontWeight.normal,
+//              color: Colors.white70
+//          ),
+//        ),
+//      )).toList(),
+//      onSelectedItemChanged: (int value) {
+//        onChanged(category.units[value].name);
+//      },
+//    ),
+//  );
 
   _clearInput() {
     _updateInput("");
@@ -588,7 +624,7 @@ class _ConverterState extends State<Converter> {
             _createButton("4"),
             _createButton("5"),
             _createButton("6"),
-            _createButton(_specialButtonText.isEmpty ? ' ': "."),
+            _createButton(_specialButtonText.isEmpty ? ' ': ".", color: Color(0xffdfdfdf)),
           ],
         ),
         Row(
@@ -612,7 +648,7 @@ class _ConverterState extends State<Converter> {
           child: Icon(icon, color: Colors.white60, size: 20,),
         ));
 
-  _createButton(String char) => InkResponse(
+  _createButton(String char, {Color color = conf.accentColor2}) => InkResponse(
     radius: 64,
     onTap: char == ' ' ? null : () => char == '.' ? _onKeyboardTap('.') : _onKeyboardTap(char),
     child: FlatButton(
@@ -622,7 +658,7 @@ class _ConverterState extends State<Converter> {
         style: Theme.of(context).textTheme.headline
         .copyWith(
           fontWeight: FontWeight.w200,
-          color: Color(0xffdfdfdf),
+          color: color,
         ).apply(
           fontSizeFactor: 1.25,
         ),
@@ -670,10 +706,10 @@ class _IconRotationState extends State<_IconRotationWidget>
       turns: _controller,
       child: GestureDetector(
           onTap: _animate,
-          child: SvgPicture.asset(
+          child: WebsafeSvg.asset(
             widget.icon,
             width: 48,
-            color: Colors.white.withAlpha(0x99),
+            color: conf.accentColor1,
           )
       )
     );

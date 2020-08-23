@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 
-import 'glob.dart' as glob;
 import 'util.dart' as util;
 
 class Category {
@@ -12,7 +11,7 @@ class Category {
   const Category(this.name, this.units)
       : assert(name != null), assert(units != null);
 
-  get icon => glob.iconsPath(name);
+  get icon => "assets/icons/${name.replaceAll(' ', '_').toLowerCase()}.svg";
 
 }
 
@@ -40,5 +39,8 @@ class Unit {
         baseUnit = jsonMap['baseUnit'];
 
   bool get hasDescription => !util.isEmpty(description);
+
+  @override
+  String toString() => name;
 
 }

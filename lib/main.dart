@@ -1,44 +1,51 @@
 
+import 'package:converter/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get_it/get_it.dart';
 
-import 'glob.dart';
+import 'conf.dart';
 import 'localization.dart';
 import 'main_screen.dart';
 
-main() => runApp(UnitConverterApp());
+main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  GetIt.I.registerSingleton(AppState());
+  runApp(UnitConverterApp());
+}
 
 class UnitConverterApp extends StatelessWidget {
 
   @override
-  Widget build(BuildContext context) =>
-    MaterialApp(
+  Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
       //theme
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: appColor,
-        primaryColor: appColor.shade700,
-        backgroundColor: appColor.shade300,
-        accentColor: Colors.blue,
+        primaryColor: backgroundColor,
+        backgroundColor: backgroundColor,
+        accentColor: Colors.grey.shade900,
         fontFamily: 'Raleway',
         snackBarTheme: SnackBarThemeData(
           backgroundColor: Colors.grey.shade900,
-          contentTextStyle: Theme.of(context).textTheme.body1.apply(
+          contentTextStyle: Theme.of(context).textTheme.bodyText2.apply(
             color: Colors.white70
           )
         ),
       ),
       //localization
-      onGenerateTitle: (BuildContext context) => AppLocalizations.of(context).title,
+      onGenerateTitle: (BuildContext context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: [
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [ Locale('en', ''),],
+      supportedLocales: [ Locale('en'), ],
     );
+  }
 
 }

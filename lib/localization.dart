@@ -29,28 +29,27 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  //TODO implement full localization support
-  // - units data asset
-  // - about dialog
   static Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      'title': 'Goofy Converter',
-      'selectCategory': 'Select a Category',
+      'title': 'Converter',
       'conversion': 'Conversion',
       'enterValue': 'Enter value',
       'incorrectInput': 'Incorrect input',
+      'seeOnPlayStore': 'See on Google Play',
+      'appGitHubPage': 'App GitHub page',
+      'madeByTaking': 'Made by taking Udacity course'
     },
   };
 
   Map<String, String> get _localized => _localizedValues[locale.languageCode];
 
-  String get title => _localized['title'];
-  String get selectCategory => _localized['selectCategory'];
-  String get madeByTaking => _localized['madeByTaking'];
+  String get appTitle => _localized['title'];
   String get course => _localized['course'];
-  String get seeOnGooglePlay => _localized['seeOnGooglePlay'];
   String get conversion => _localized['conversion'];
   String get enterValue => _localized['enterValue'];
   String get incorrectInput => _localized['incorrectInput'];
+  String get seeOnPlayStore => _localized['seeOnPlayStore'];
+  String get appGitHubPage => _localized['appGitHubPage'];
+  String get madeByTaking => _localized['madeByTaking'];
 
 }

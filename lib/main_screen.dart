@@ -2,122 +2,91 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
+import 'package:websafe_svg/websafe_svg.dart';
 
-import 'api.dart';
 import 'backdrop.dart';
 import 'category.dart';
+import 'conf.dart' as conf;
 import 'converter.dart';
 import 'ext.dart';
-import 'glob.dart' as glob;
 import 'localization.dart';
-import 'prefs.dart' as prefs;
+import 'state.dart';
 
 const _landscapeItemsCount = 2;
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
+
+@override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      child: _MainScreenWidget(),
+      onWillPop: () {
+        final appState = GetIt.I.get<AppState>();
+        final opened = appState.opened.value;
+        if (opened)
+          appState.opened.value = false;
+        return Future.value(!opened);
+      },
+    );
+  }
+}
+
+class _MainScreenWidget extends StatefulWidget {
 
   @override
   _MainScreenState createState() => _MainScreenState();
 
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<_MainScreenWidget> {
 
-  Category _defaultCategory;
-  Category _currentCategory;
-  final _categories = <Category>[];
-  final _categoryNotifier = ChangeNotifier();
-
-  @override
-  void initState() {
-    super.initState();
-    if (_categories.isEmpty) {
-      _processLocalCategories();
-      // now, Api just fetches mock currencies
-//      _fetchApiCategories();
-    }
-  }
+  AppState appState = GetIt.I.get<AppState>();
 
   @override
   Widget build(BuildContext context) {
-    //still loading
-    if (_defaultCategory == null) {
-      return Container(color: Theme.of(context).backgroundColor);
-    }
-
-    // Based on the device size, figure out how to best lay out the list
-    assert(debugCheckHasMediaQuery(context));
-
-    final category = _currentCategory ?? _defaultCategory;
-    return Backdrop(
-      categoryNotifier: _categoryNotifier,
-      category: category,
-      frontPanel: Converter(category),
-      backPanel: _buildCategoryWidgets(),
-      frontTitle: Text(AppLocalizations.of(context).title),
-      backTitle: Text(AppLocalizations.of(context).selectCategory),
+    return FutureBuilder<List<Category>>(
+      future: appState.categories,
+      builder: (ctx, snap) {
+        if (!snap.hasData)
+          return Center(child: CircularProgressIndicator());
+        return Backdrop(
+          frontPanel: Converter(),
+          backPanel: _buildCats(snap.data),
+          frontTitle: Text(AppLocalizations.of(context).appTitle),
+          backTitle: Text(AppLocalizations.of(context).appTitle),
+        );
+      }
     );
   }
 
-  Future<void> _processLocalCategories() async {
-    final lastCategory = await prefs.loadCategory();
-    final json = DefaultAssetBundle.of(context).loadString(glob.unitsFile);
-    final data = JsonDecoder().convert(await json);
+//  Future<void> _fetchApiCategories() async {
+//    final api = Api();
+//    print("retrieve Api Category, await units");
+//
+//    final jsonUnits = await api.getUnits(apiCurrencyCategory['route']);
+//    print("retrieve Api Category, complete: $jsonUnits");
+//
+//    if (jsonUnits != null) {
+//      final units = jsonUnits.map((unit) => Unit.fromJson(unit)).toList();
+//      setState(() {
+//        _categories.add(Category(apiCurrencyCategory['name'], units));
+//      });
+//    }
+//  }
 
-    if (data is! Map) {
-      throw ('Data retrieved from API is not a Map');
-    }
-
-    for (String key in data.keys) {
-      final category = Category(
-          key, data[key].map<Unit>((raw) => Unit.fromJson(raw)).toList()
-      );
-
-      _categories.add(category);
-
-      if (_defaultCategory == null && category.name == lastCategory) {
-        setState(() {
-          _defaultCategory = category;
-        });
-      }
-    }
-
-    if (_defaultCategory == null)
-     setState(() {
-      _defaultCategory = _categories.first;
-     });
+  _selectCategory(Category category) {
+    appState.category.value = category;
+    appState.opened.value = true;
   }
 
-  Future<void> _fetchApiCategories() async {
-    final api = Api();
-    print("retrieve Api Category, await units");
-
-    final jsonUnits = await api.getUnits(apiCurrencyCategory['route']);
-    print("retrieve Api Category, complete: $jsonUnits");
-
-    if (jsonUnits != null) {
-      final units = jsonUnits.map((unit) => Unit.fromJson(unit)).toList();
-      setState(() {
-        _categories.add(Category(apiCurrencyCategory['name'], units));
-      });
-    }
-  }
-
-  _onCategoryTap(Category category) {
-    setState(() {
-      _currentCategory = category;
-      prefs.saveCategory(category);
-      _categoryNotifier.notifyListeners();
-    });
-  }
-
-  _buildCategoryWidgets() {
+  _buildCats(List<Category> cats) {
     Widget list;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      list = ListView.builder(
-          itemCount: _categories.length,
-          itemBuilder: (ctx, idx) => _buildCategoryWidget(_categories[idx], true)
+      list = Column(
+        children: cats.map((cat) => Flexible(
+          child: _buildCategoryWidget(cat, true)
+        )).toList()
       );
     } else {
       list = GridView.count(
@@ -125,8 +94,8 @@ class _MainScreenState extends State<MainScreen> {
         childAspectRatio: 3,
         children: () {
           final widgets = <Widget>[];
-          for (int i=0; i<_categories.length; i++) {
-            widgets.add(_buildCategoryWidget(_categories[i], i%_landscapeItemsCount==1));
+          for (int i=0; i<cats.length; i++) {
+            widgets.add(_buildCategoryWidget(cats[i], i%_landscapeItemsCount==1));
           }
           return widgets.toList();
         }(),
@@ -134,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
     }
     return Padding(
       child: list,
-      padding: bot(glob.backdropHeaderSize),
+      padding: bot(conf.backdropHeaderSize),
     );
   }
 
@@ -145,24 +114,24 @@ class _MainScreenState extends State<MainScreen> {
         height: 100.0,
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
-          splashColor: Theme.of(context).primaryColor,
-          onTap: () => _onCategoryTap(category),
+          splashColor: Colors.black,
+          onTap: () => _selectCategory(category),
           child: Padding(
             padding: all(8.0),
             child: Row(
             children: (){
-              final icon = SvgPicture.asset(
+              final icon = WebsafeSvg.asset(
                 category.icon,
                 width: 48,
-                color: Colors.black87
+                color: conf.accentColor1
               );
               final title = Text(
                 category.name,
                 maxLines: 2,
                 textAlign: iconToStart ? TextAlign.start : TextAlign.end,
                 overflow: TextOverflow.fade,
-                style: Theme.of(context).textTheme.headline.apply(
-                    color: Colors.black87
+                style: Theme.of(context).textTheme.headline5.apply(
+                    color: conf.accentColor3
                 ),
               );
               final widgets = <Widget>[];
