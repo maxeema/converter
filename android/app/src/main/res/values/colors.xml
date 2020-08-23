@@ -2,9 +2,6 @@
 
 <resources>
 
-    <color name="windowBackground">#ffffff</color>
-
-    <color name="indigo400">#FF5C6BC0</color>
-    <color name="indigo">#FF3F51B5</color>
+    <color name="windowBackground">#ff090909</color>
 
 </resources>
