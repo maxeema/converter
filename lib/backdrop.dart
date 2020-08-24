@@ -152,7 +152,6 @@ class _BackdropState extends State<Backdrop>
     _controller.addStatusListener(animationChanged);
   }
   animationChanged(AnimationStatus status) {
-    print(status);
     if (status == AnimationStatus.dismissed) {
         appState.opened.value = false;
     }
