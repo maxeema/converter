@@ -30,6 +30,9 @@ class UnitConverterApp extends StatelessWidget {
         backgroundColor: backgroundColor,
         accentColor: Colors.grey.shade900,
         fontFamily: 'Raleway',
+        dialogTheme: DialogTheme(
+          backgroundColor: Colors.grey.shade900,
+        ),
         snackBarTheme: SnackBarThemeData(
           backgroundColor: Colors.grey.shade900,
           contentTextStyle: Theme.of(context).textTheme.bodyText2.apply(
