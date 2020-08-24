@@ -2,6 +2,7 @@
 import 'package:converter/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
 
@@ -15,10 +16,14 @@ main() {
   runApp(UnitConverterApp());
 }
 
-class UnitConverterApp extends StatelessWidget {
+class UnitConverterApp extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useEffect(() {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      return null;
+    }, ["onetime"]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MainScreen(),

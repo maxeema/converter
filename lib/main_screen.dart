@@ -32,16 +32,9 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-class _MainScreenWidget extends StatefulWidget {
+class _MainScreenWidget extends StatelessWidget {
 
-  @override
-  _MainScreenState createState() => _MainScreenState();
-
-}
-
-class _MainScreenState extends State<_MainScreenWidget> {
-
-  AppState appState = GetIt.I.get<AppState>();
+  final appState = GetIt.I.get<AppState>();
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +45,7 @@ class _MainScreenState extends State<_MainScreenWidget> {
           return Center(child: CircularProgressIndicator());
         return Backdrop(
           frontPanel: Converter(),
-          backPanel: _buildCats(snap.data),
+          backPanel: _buildCats(context, snap.data),
           frontTitle: Text(AppLocalizations.of(context).appTitle),
           backTitle: Text(AppLocalizations.of(context).appTitle),
         );
@@ -80,14 +73,14 @@ class _MainScreenState extends State<_MainScreenWidget> {
     appState.opened.value = true;
   }
 
-  _buildCats(List<Category> cats) {
+  _buildCats(BuildContext context, List<Category> cats) {
     Widget list;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       list = Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: cats.map((cat) => Flexible(
-          child: _buildCategoryWidget(cat, true)
+          child: _buildCategoryWidget(context, cat, true)
         )).toList()
       );
     } else {
@@ -97,7 +90,7 @@ class _MainScreenState extends State<_MainScreenWidget> {
         children: () {
           final widgets = <Widget>[];
           for (int i=0; i<cats.length; i++) {
-            widgets.add(_buildCategoryWidget(cats[i], i%_landscapeItemsCount==1));
+            widgets.add(_buildCategoryWidget(context, cats[i], i%_landscapeItemsCount==1));
           }
           return widgets.toList();
         }(),
@@ -112,7 +105,7 @@ class _MainScreenState extends State<_MainScreenWidget> {
     );
   }
 
-  _buildCategoryWidget(Category category, bool iconToStart) =>
+  _buildCategoryWidget(BuildContext context, Category category, bool iconToStart) =>
     Container(
       height: 100.0,
       child: InkWell(
