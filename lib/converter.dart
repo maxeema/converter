@@ -415,20 +415,26 @@ class _ConverterState extends State<Converter> {
             flex: 2,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.display2.apply(
-                  color: Colors.white.withAlpha(0x99),
-                ),
-                child: ui.toFittedBox(
-                  Text(
-                    category.name,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w200,
-                        color: conf.accentColor1
-                    ),
+              child: InkResponse(
+                radius: 40,
+                onTap: () {
+                  appState.opened.value = false;
+                },
+                child: DefaultTextStyle(
+                  style: Theme.of(context).textTheme.display2.apply(
+                    color: Colors.white.withAlpha(0x99),
+                  ),
+                  child: ui.toFittedBox(
+                    Text(
+                      category.name,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w200,
+                          color: conf.accentColor1
+                      ),
+                    )
                   )
-                )
-              )
+                ),
+              ),
             ),
           ),
           SizedBox(
@@ -447,13 +453,19 @@ class _ConverterState extends State<Converter> {
           SizedBox(
             width: 48,
           ),
-          DefaultTextStyle(
-            style: Theme.of(context).textTheme.display2.apply(
-              color: Colors.white70,
-            ),
-            child: Text(
-              category.name,
-              style: TextStyle(fontWeight: FontWeight.w200),
+          InkResponse(
+            radius: 40,
+            onTap: () {
+              appState.opened.value = false;
+            },
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.display2.apply(
+                color: Colors.white70,
+              ),
+              child: Text(
+                category.name,
+                style: TextStyle(fontWeight: FontWeight.w200),
+              ),
             ),
           ),
           SizedBox(
