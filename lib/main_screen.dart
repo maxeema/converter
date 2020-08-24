@@ -84,6 +84,8 @@ class _MainScreenState extends State<_MainScreenWidget> {
     Widget list;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       list = Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: cats.map((cat) => Flexible(
           child: _buildCategoryWidget(cat, true)
         )).toList()
@@ -101,52 +103,52 @@ class _MainScreenState extends State<_MainScreenWidget> {
         }(),
       );
     }
-    return Padding(
-      child: list,
-      padding: bot(conf.backdropHeaderSize),
+    return Material(
+      color: Colors.transparent,
+      child: Padding(
+        child: list,
+        padding: bot(conf.backdropHeaderSize),
+      ),
     );
   }
 
   _buildCategoryWidget(Category category, bool iconToStart) =>
-    Material(
-      color: Colors.transparent,
-      child: Container(
-        height: 100.0,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(30),
-          splashColor: Colors.black,
-          onTap: () => _selectCategory(category),
-          child: Padding(
-            padding: all(8.0),
-            child: Row(
-            children: (){
-              final icon = WebsafeSvg.asset(
-                category.icon,
-                width: 48,
-                color: conf.accentColor1
-              );
-              final title = Text(
-                category.name,
-                maxLines: 2,
-                textAlign: iconToStart ? TextAlign.start : TextAlign.end,
-                overflow: TextOverflow.fade,
-                style: Theme.of(context).textTheme.headline5.apply(
-                    color: conf.accentColor3
-                ),
-              );
-              final widgets = <Widget>[];
-              widgets.add(SizedBox(width: 16));
-              widgets.add(Expanded(flex: iconToStart ? 1 : 2,
-                child: iconToStart ? icon : title
-              ));
-              widgets.add(SizedBox(width: 24));
-              widgets.add(Expanded(flex: iconToStart ? 2 : 1,
-                child: iconToStart ? title : icon,
-              ));
-              widgets.add(SizedBox(width: 16));
-              return widgets;
-              }()
-            ),
+    Container(
+      height: 100.0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(30),
+        splashColor: Colors.black,
+        onTap: () => _selectCategory(category),
+        child: Padding(
+          padding: all(8.0),
+          child: Row(
+          children: (){
+            final icon = WebsafeSvg.asset(
+              category.icon,
+              width: 48,
+              color: conf.accentColor1
+            );
+            final title = Text(
+              category.name,
+              maxLines: 2,
+              textAlign: iconToStart ? TextAlign.start : TextAlign.end,
+              overflow: TextOverflow.fade,
+              style: Theme.of(context).textTheme.headline5.apply(
+                  color: conf.accentColor3
+              ),
+            );
+            final widgets = <Widget>[];
+            widgets.add(SizedBox(width: 16));
+            widgets.add(Expanded(flex: iconToStart ? 1 : 2,
+              child: iconToStart ? icon : title
+            ));
+            widgets.add(SizedBox(width: 24));
+            widgets.add(Expanded(flex: iconToStart ? 2 : 1,
+              child: iconToStart ? title : icon,
+            ));
+            widgets.add(SizedBox(width: 16));
+            return widgets;
+            }()
           ),
         ),
       ),
