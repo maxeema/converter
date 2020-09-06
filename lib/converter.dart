@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 import 'category.dart';
+import 'units.dart';
 import 'ext.dart';
 import 'conf.dart' as conf;
 import 'localization.dart';
@@ -27,7 +28,9 @@ class Converter extends StatefulWidget {
 class _ConverterState extends State<Converter> {
 
   AppState appState = GetIt.I.get<AppState>();
-  Category get category => appState.category.value;
+
+  CategoryInfo get catInfo => appState.catInfo.value;
+  Category get category => catInfo?.category;
 
   final _textController = TextEditingController();
   TextSelection _textSelection;
@@ -45,12 +48,12 @@ class _ConverterState extends State<Converter> {
   @override
   initState() {
     super.initState();
-    appState.category.addListener(onCategoryChanged);
+    appState.catInfo.addListener(onCategoryChanged);
     _focusNode = FocusNode();
   }
   @override
   dispose() {
-    appState.category.removeListener(onCategoryChanged);
+    appState.catInfo.removeListener(onCategoryChanged);
     _focusNode.dispose();
     super.dispose();
   }
@@ -76,7 +79,8 @@ class _ConverterState extends State<Converter> {
   String _formatConversion(double value) {
     if (value == null)
       return double.nan.toString();
-    var outputNum = value.toStringAsPrecision(7);
+    // var outputNum = value.toStringAsPrecision(appState.units.value.precision);
+    var outputNum = value.toStringAsFixed(appState.units.value.precision);
     if (outputNum.contains('.') && outputNum.endsWith('0')) {
       var i = outputNum.length - 1;
       while (outputNum[i] == '0') {
@@ -174,9 +178,9 @@ class _ConverterState extends State<Converter> {
       showCursor: true,
       autofocus: true,
       textAlign: TextAlign.center,
-      cursorColor: Colors.white,
+      cursorColor: Colors.white.withOpacity(.7),
       style: Theme.of(context).textTheme.headline3.apply(
-        color: _isInputError ? Colors.red.shade500 : Colors.white,
+        color: _isInputError ? Colors.red.shade500 : Colors.white.withOpacity(.85),
         fontSizeFactor: 0.8,
       ),
       keyboardType: TextInputType.number,
@@ -185,7 +189,7 @@ class _ConverterState extends State<Converter> {
         hintText: AppLocalizations.of(context).enterValue,
         hintStyle: Theme.of(context).textTheme.title.apply(
             fontSizeFactor: 1.2,
-            color: Colors.white
+            color: Colors.white.withOpacity(.7)
         ),
 //        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
 //        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
@@ -215,8 +219,8 @@ class _ConverterState extends State<Converter> {
         fontSizeFactor:
         _isInputError || isEmpty(_convertedValue) ? .7 : 1,
         color: _isInputError || isEmpty(_convertedValue)
-            ? conf.accentColor3.withAlpha(0x99)
-            : conf.accentColor3,
+            ? conf.accentColor1.withAlpha(0x99)
+            : conf.accentColor1,
       )
     );
     final output = AnimatedSwitcher(
@@ -406,7 +410,7 @@ class _ConverterState extends State<Converter> {
           SizedBox(width: 8,),
           Expanded(
             flex:1,
-            child: _IconRotationWidget(category.icon),
+            child: _IconRotationWidget(category.icon, catInfo.color),
           ),
           SizedBox(
             width: 24,
@@ -429,7 +433,7 @@ class _ConverterState extends State<Converter> {
                       category.name,
                       style: TextStyle(
                           fontWeight: FontWeight.w200,
-                          color: conf.accentColor1
+                          color: catInfo.color,
                       ),
                     )
                   )
@@ -449,7 +453,7 @@ class _ConverterState extends State<Converter> {
           SizedBox(
             width: 8,
           ),
-          _IconRotationWidget(category.icon),
+          _IconRotationWidget(category.icon, catInfo.color),
           SizedBox(
             width: 48,
           ),
@@ -669,7 +673,7 @@ class _ConverterState extends State<Converter> {
         char == '.' ? _specialButtonText : char,
         style: Theme.of(context).textTheme.headline
         .copyWith(
-          fontWeight: FontWeight.w200,
+          // fontWeight: FontWeight.w200,
           color: color,
         ).apply(
           fontSizeFactor: 1.25,
@@ -689,7 +693,8 @@ class _ConverterState extends State<Converter> {
 class _IconRotationWidget extends StatefulWidget {
 
   final String icon;
-  const _IconRotationWidget(this.icon);
+  final Color color;
+  const _IconRotationWidget(this.icon, this.color);
 
   @override
   _IconRotationState createState() => _IconRotationState();
@@ -721,7 +726,7 @@ class _IconRotationState extends State<_IconRotationWidget>
           child: WebsafeSvg.asset(
             widget.icon,
             width: 48,
-            color: conf.accentColor1,
+            color: widget.color,
           )
       )
     );

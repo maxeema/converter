@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 
 import 'util.dart' as util;
 
+class CategoryInfo {
+  final Category category;
+  final Color color;
+
+  CategoryInfo(this.category, this.color);
+}
+
 class Category {
 
   final String name;
@@ -30,13 +37,13 @@ class Unit {
   })  : assert(name != null),
         assert(conversion != null);
 
-  Unit.fromJson(Map jsonMap)
-      : assert(jsonMap['name'] != null),
-        assert(jsonMap['conversion'] != null),
-        name = jsonMap['name'],
-        conversion = jsonMap['conversion'].toDouble(),
-        description = jsonMap['description'],
-        baseUnit = jsonMap['baseUnit'];
+  Unit.fromJson(Map j)
+      : assert(j['name'] != null),
+        assert(j['conversion'] != null),
+        name = j['name'],
+        conversion = j['conversion'].toDouble(),
+        description = j['description'],
+        baseUnit = j['baseUnit'];
 
   bool get hasDescription => !util.isEmpty(description);
 

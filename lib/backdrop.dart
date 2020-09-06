@@ -8,6 +8,8 @@ import 'package:meta/meta.dart';
 
 import 'about_dialog.dart';
 import 'conf.dart' as conf;
+import 'conf.dart';
+import 'extensions.dart';
 import 'ext.dart';
 import 'state.dart';
 
@@ -248,19 +250,23 @@ class _BackdropState extends State<Backdrop>
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        leading: ValueListenableBuilder<bool>(
-          valueListenable: appState.opened,
-          child: Center(child: Icon(Icons.menu)),
-          builder: (ctx, opened, widget) {
-            return AnimatedSwitcher(
-              duration: mil(300),
-              child: IconButton(
-                icon: Opacity(opacity: opened ? 1 : 0.25, child: widget),
-                onPressed: opened ? _toggleBackdropPanelVisibility : null,
-              ),
-            );
-          },
-        ),
+        // leading: ValueListenableBuilder<bool>(
+        //   valueListenable: appState.opened,
+        //   child: Center(child: Icon(Icons.refresh)),
+        //   builder: (ctx, opened, widget) {
+        //     return AnimatedSwitcher(
+        //       duration: mil(300),
+        //       child: IconButton(
+        //         // key: ValueKey(appState.units.value),
+        //         icon: Opacity(opacity: 0.5, child: widget),
+        //         // onPressed: opened ? _toggleBackdropPanelVisibility : null,
+        //         onPressed: () {
+        //           appState.units.value = appState.units.value.next;
+        //         },
+        //       ),
+        //     );
+        //   },
+        // ),
 //        leading: IconButton(
 //          onPressed: _toggleBackdropPanelVisibility,
 //          icon: AnimatedIcon(
@@ -275,10 +281,18 @@ class _BackdropState extends State<Backdrop>
         ),
         centerTitle: false,
         actions: <Widget>[
-          IconButton(
-            icon:Icon(Icons.info_outline, color: Colors.white54,),
-            onPressed: ()=> showAbout(context)
-          )
+          FutureBuilder<Object>(
+              future: Future.delayed(1200.ms, () => 'ok'),
+              builder: (context, snapshot) {
+                return AnimatedSwitcher(duration: 1000.ms,
+                  child: snapshot.hasData ? IconButton(
+                      // key: ValueKey(snapshot.hasData),
+                      icon: Icon(Icons.info_outline, color: accentColor5.withOpacity(.7)),
+                      onPressed: ()=> showAbout(context)
+                  ) : Container(),
+                );
+              }
+          ),
         ],
       ),
       body: LayoutBuilder(
