@@ -9,7 +9,8 @@ import 'units.dart';
 
 class AppState {
 
-  final category = ValueNotifier<Category>(null);
+  final units = ValueNotifier(Units.standard);
+  final catInfo = ValueNotifier<CategoryInfo>(null);
   final opened = ValueNotifier(false);
   final input = ValueNotifier("");
 

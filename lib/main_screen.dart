@@ -1,15 +1,17 @@
 
 import 'dart:convert';
 
+import 'package:converter/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:websafe_svg/websafe_svg.dart';
 
 import 'backdrop.dart';
 import 'category.dart';
+import 'category_widget.dart';
 import 'conf.dart' as conf;
+import 'conf.dart';
 import 'converter.dart';
-import 'ext.dart';
+import 'insets.dart';
 import 'localization.dart';
 import 'state.dart';
 
@@ -43,11 +45,68 @@ class _MainScreenWidget extends StatelessWidget {
       builder: (ctx, snap) {
         if (!snap.hasData)
           return Center(child: CircularProgressIndicator());
+        final cats = snap.data;
         return Backdrop(
           frontPanel: Converter(),
-          backPanel: _buildCats(context, snap.data),
-          frontTitle: Text(AppLocalizations.of(context).appTitle),
-          backTitle: Text(AppLocalizations.of(context).appTitle),
+          backPanel: LayoutBuilder(
+            builder: (ctx, constraints) {
+              Widget list;
+              var i = 0;
+              if (MediaQuery.of(context).orientation == Orientation.portrait) {
+                list = Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: cats.map((cat) {
+                      final idx = i++;
+                      return Flexible(
+                          child: CategoryWidget(
+                              catInfo: CategoryInfo(cat, colors[idx%2]),
+                              onSelect: _selectCategory,
+                              placeIconToStart: true,
+                              appearanceDelay: Duration(milliseconds: i*150),
+                              // margin: idx.isOdd ? 60.insets.start : 0.insets.start
+                              margin: 0.insets.start
+                          )
+                      );
+                    }).toList()
+                );
+              } else {
+                list = GridView.count(
+                  crossAxisCount: _landscapeItemsCount,
+                  childAspectRatio: 3,
+                  children: cats.map((cat) {
+                    final idx = i++;
+                    return CategoryWidget(
+                      catInfo: CategoryInfo(cat, colors[idx%2]),
+                      onSelect: _selectCategory,
+                      placeIconToStart: idx%_landscapeItemsCount==1,
+                      appearanceDelay: Duration(milliseconds: idx*100),
+                    );
+                  }).toList(),
+                );
+              }
+              return Material(
+                color: Colors.transparent,
+                child: Container(
+                  color: Colors.transparent,
+                    padding: conf.backdropHeaderSize.toInt().insets.bot,
+                    child: list,
+                ),
+              );
+            },
+          ),
+          frontTitle: Opacity(opacity: .7 , child: Text(AppLocalizations.of(context).appTitle)),
+          backTitle: FutureBuilder<Object>(
+            future: Future.delayed(1000.ms, () => 'ok'),
+            builder: (context, snapshot) {
+              return AnimatedSwitcher(duration: 1000.ms,
+                  child: Text(
+                      snapshot.hasData ? AppLocalizations.of(context).appTitle : ' ',
+                      key: ValueKey(snapshot.hasData)
+                  ),
+                );
+            }
+          ),
         );
       }
     );
@@ -68,83 +127,9 @@ class _MainScreenWidget extends StatelessWidget {
 //    }
 //  }
 
-  _selectCategory(Category category) {
-    appState.category.value = category;
+  _selectCategory(CategoryInfo category) {
+    appState.catInfo.value = category;
     appState.opened.value = true;
   }
-
-  _buildCats(BuildContext context, List<Category> cats) {
-    Widget list;
-    if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      list = Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: cats.map((cat) => Flexible(
-          child: _buildCategoryWidget(context, cat, true)
-        )).toList()
-      );
-    } else {
-      list = GridView.count(
-        crossAxisCount: _landscapeItemsCount,
-        childAspectRatio: 3,
-        children: () {
-          final widgets = <Widget>[];
-          for (int i=0; i<cats.length; i++) {
-            widgets.add(_buildCategoryWidget(context, cats[i], i%_landscapeItemsCount==1));
-          }
-          return widgets.toList();
-        }(),
-      );
-    }
-    return Material(
-      color: Colors.transparent,
-      child: Padding(
-        child: list,
-        padding: bot(conf.backdropHeaderSize),
-      ),
-    );
-  }
-
-  _buildCategoryWidget(BuildContext context, Category category, bool iconToStart) =>
-    Container(
-      height: 100.0,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(30),
-        splashColor: Colors.black,
-        onTap: () => _selectCategory(category),
-        child: Padding(
-          padding: all(8.0),
-          child: Row(
-          children: (){
-            final icon = WebsafeSvg.asset(
-              category.icon,
-              width: 48,
-              color: conf.accentColor1
-            );
-            final title = Text(
-              category.name,
-              maxLines: 2,
-              textAlign: iconToStart ? TextAlign.start : TextAlign.end,
-              overflow: TextOverflow.fade,
-              style: Theme.of(context).textTheme.headline5.apply(
-                  color: conf.accentColor3
-              ),
-            );
-            final widgets = <Widget>[];
-            widgets.add(SizedBox(width: 16));
-            widgets.add(Expanded(flex: iconToStart ? 1 : 2,
-              child: iconToStart ? icon : title
-            ));
-            widgets.add(SizedBox(width: 24));
-            widgets.add(Expanded(flex: iconToStart ? 2 : 1,
-              child: iconToStart ? title : icon,
-            ));
-            widgets.add(SizedBox(width: 16));
-            return widgets;
-            }()
-          ),
-        ),
-      ),
-    );
 
 }

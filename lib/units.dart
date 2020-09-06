@@ -10,4 +10,11 @@ extension UnitsExt on Units {
       case Units.standard: return 'assets/data/standard_units.json';
     }
   }
+  //
+  int get precision => this == Units.goofy ? 7 : 2;
+  //
+  Units get next {
+    final units = Units.values;
+    return units.last == this ? units.first : units[units.indexOf(this)+1];
+  }
 }

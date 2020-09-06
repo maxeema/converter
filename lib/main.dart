@@ -9,6 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'conf.dart';
 import 'localization.dart';
 import 'main_screen.dart';
+import 'insets.dart';
 
 main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +27,30 @@ class UnitConverterApp extends HookWidget {
     }, ["onetime"]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(),
+      home: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: MainScreen()
+          ),
+          Container(
+            padding: 10.insets.all,
+            child: Text(appLegalese, style: TextStyle(
+              fontFamily: 'Raleway',
+              fontSize: 14,
+              decoration: TextDecoration.none,
+              color: accentColor5.withOpacity(.7)
+            )),
+          )
+        ],
+      ),
       //theme
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: backgroundColor,
         backgroundColor: backgroundColor,
-        accentColor: Colors.grey.shade900,
+        accentColor: accentColor5,
         fontFamily: 'Raleway',
         dialogTheme: DialogTheme(
           backgroundColor: Colors.grey.shade900,
