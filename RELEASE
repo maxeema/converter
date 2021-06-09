@@ -1,4 +1,4 @@
-RELEASE NOTES
+0.5.6+6
 - added building apk with GitHub Actions
 - added Firebase app distribution via GitHub Actions
 
