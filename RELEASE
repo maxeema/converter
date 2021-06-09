@@ -1,3 +1,6 @@
+0.6.8+8
+- transformed main CI to Android only
+
 0.6.7+7
 - added initial GitHub actions support
 - added building apk with GitHub Actions
