@@ -1,9 +1,9 @@
-name: CI
+name: android distribution CI
 
 on:
   push:
     tags:
-      - "v*"
+      - "android-*"
 jobs:
   build:
     runs-on: ubuntu-latest
