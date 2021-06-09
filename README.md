@@ -11,4 +11,4 @@ Made by taking Udacity course [Build Native Mobile Apps with Flutter](https://ww
 ![Screenshot](screens/Converter5.png) ![Screenshot](screens/Converter4.png)
 
 
-© iMax (Maxeem) Shemetov, 2020
+© Max Shemetov, 2021

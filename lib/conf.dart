@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-const appLegalese      = "© iMax Shemetov, 2020";
+const appLegalese      = "© Max Shemetov, 2021";
 const appGithubPage    = 'https://github.com/maxeema/converter';
 const appPlayStoreUrl  = "https://play.google.com/store/apps/details?id=%package%";
 const appUdacityCourse = 'https://www.udacity.com/course/build-native-mobile-apps-with-flutter--ud905';
