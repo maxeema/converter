@@ -1,0 +1,38 @@
+name: App Build CI
+
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
+jobs:
+  build:
+    # This job will run on ubuntu virtual machine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable' # or: 'beta', 'dev' or 'master'
+      - run: flutter pub get
+#      - run: flutter analyze --no-pub --no-fatal-infos --no-fatal-warnings
+#      - run: flutter test --no-pub
+#      - uses: actions/setup-java@v1
+#        with:
+#          java-version: '12.x'
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - run: flutter build apk
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: build/app/outputs/apk/release/app-release.apk
+          releaseNotesFile: RELEASE
