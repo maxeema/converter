@@ -15,18 +15,18 @@ def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} else if (System.getenv()["CI"]) {
-    // CodeMagic CI
-    keystoreProperties.setProperty('storePassword', System.getenv('FCI_KEYSTORE_PASSWORD'))
-    keystoreProperties.setProperty('keyPassword', System.getenv('FCI_KEY_PASSWORD'))
-    keystoreProperties.setProperty('keyAlias', System.getenv('FCI_KEY_ALIAS'))
-    keystoreProperties.setProperty('storeFile', System.getenv("FCI_BUILD_DIR") + "/../keystore/maxeem.jks")
-} else {
-    // GitHub Actions
+} else if (System.getenv().containsKey("GITHUB_ACTIONS")) {
+    // we are on GitHub Actions
     keystoreProperties.setProperty('storePassword', System.getenv('KEY_STORE_PASSWORD'))
     keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD'))
     keystoreProperties.setProperty('keyAlias', 'key0')
     keystoreProperties.setProperty('storeFile', '../maxeem.jks')
+} else if (System.getenv().containsKey("FCI_COMMIT")) {
+    // we are at CodeMagic CI
+    keystoreProperties.setProperty('storePassword', System.getenv('FCI_KEYSTORE_PASSWORD'))
+    keystoreProperties.setProperty('keyPassword', System.getenv('FCI_KEY_PASSWORD'))
+    keystoreProperties.setProperty('keyAlias', System.getenv('FCI_KEY_ALIAS'))
+    keystoreProperties.setProperty('storeFile', System.getenv("FCI_BUILD_DIR") + "/../keystore/maxeem.jks")
 }
 
 apply plugin: 'com.android.application'
