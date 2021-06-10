@@ -46,13 +46,11 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Build IPA
         - run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
-          working-directory: ios
       - uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_IOS_APPID}}
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: testers
           file: build/ios/ipa/converter.ipa
-#          file: ios/build/Runner.ipa
           releaseNotesFile: RELEASE
       - run: Great Job, Max!
