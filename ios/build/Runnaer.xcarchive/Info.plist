@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ApplicationProperties</key>
+	<dict>
+		<key>ApplicationPath</key>
+		<string>Applications/Runner.app</string>
+		<key>Architectures</key>
+		<array>
+			<string>armv7</string>
+			<string>arm64</string>
+		</array>
+		<key>CFBundleIdentifier</key>
+		<string>maxeem.america.flutter.converter</string>
+		<key>CFBundleShortVersionString</key>
+		<string>0.6.8</string>
+		<key>CFBundleVersion</key>
+		<string>8</string>
+		<key>SigningIdentity</key>
+		<string>Apple Development: jmax.posh@gmail.com (Y368FCXV4C)</string>
+		<key>Team</key>
+		<string>KCKD42NRF8</string>
+	</dict>
+	<key>ArchiveVersion</key>
+	<integer>2</integer>
+	<key>CreationDate</key>
+	<date>2021-06-09T22:36:57Z</date>
+	<key>Name</key>
+	<string>Runner</string>
+	<key>SchemeName</key>
+	<string>Runner</string>
+</dict>
+</plist>
