@@ -45,7 +45,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Build IPA
-        - run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
+        run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
       - uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_IOS_APPID}}
