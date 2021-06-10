@@ -14,7 +14,7 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
 #      - run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
-      - run: flutter build ios
+      - run: flutter build ios --no-codesign
       - run: |
           xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive -allowProvisioningUpdates
           xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa -allowProvisioningUpdates
