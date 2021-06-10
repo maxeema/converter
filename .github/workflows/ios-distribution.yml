@@ -1,4 +1,4 @@
-name: android distribution CI
+name: ios distribution CI
 
 on:
   push:
