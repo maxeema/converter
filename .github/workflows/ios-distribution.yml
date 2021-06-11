@@ -16,86 +16,53 @@ jobs:
           echo "Dump env variables"
           set
           echo
-      - name: Select 12.4 Xcode
-        run: sudo xcode-select -s /Applications/Xcode_12.4.app
-      - name: Install the Apple certificate and provisioning profile
+#      - run: sudo xcode-select -s /Applications/Xcode_12.4.app
+      - name: Import Codesign Certificate
+        id: codesign-cert
+        uses: Apple-Actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.BASE64P12FILE }}
+          p12-password: ${{ secrets.P12_PASSWORD }}
+      - name: Generate App Store Connect API Token
+        id: app-store-api-token
         env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-          KEYCHAIN_PASSWORD: 123456
-          #${{ secrets.KEYCHAIN_PASSWORD }}
+          ISSUER_ID: 1bbfc512-3fd2-4926-a061-493018bf22a5
+          KEY_ID: 223GCBQ6Y3
+          AUTH_KEY: ${{ secrets.APPCONNECT_API_KEY_PRIVATE }}
         run: |
-          # create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH="$RUNNER_TEMP/4349acc7-3513-4ba7-a980-750fa87dc2be.mobileprovision"
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          
-          # prints secrets
-          echo
-          echo "BUILD_CERTIFICATE_BASE64: $BUILD_CERTIFICATE_BASE64"
-          echo "P12_PASSWORD: $P12_PASSWORD"
-          echo "BUILD_PROVISION_PROFILE_BASE64: $BUILD_PROVISION_PROFILE_BASE64"
-          echo "KEYCHAIN_PASSWORD: $KEYCHAIN_PASSWORD"
-          echo
-          
-          
-          # import certificate and provisioning profile from secrets
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
-          echo "CERTIFICATE_PATH: $CERTIFICATE_PATH"
-          ls -l $CERTIFICATE_PATH
-          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
-          echo "PP_PATH: $PP_PATH"
-          ls -l $PP_PATH
-          security cms -D -i $PP_PATH
-          #
-          
-          # create temporary keychain
-          echo "create temporary keychain, step 1: $KEYCHAIN_PASSWORD, $KEYCHAIN_PATH"
-          security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH || exit 1
-          ls -l $KEYCHAIN_PATH
-          echo "create temporary keychain, step 2"
-          security unlock-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH || exit 1
-          echo "create temporary keychain, step 3"
-          security set-keychain-settings $KEYCHAIN_PATH
-          security list-keychains
-
-
-          # import certificate to keychain
-          echo "import certificate to keychain, step 1"
-          security import $CERTIFICATE_PATH -P $P12_PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH || exit 1
-          ls -l $CERTIFICATE_PATH
-          ls -l $KEYCHAIN_PATH
-          echo "import certificate to keychain, step 2"
-          security list-keychain -d user
-          security list-keychain -d user -s $KEYCHAIN_PATH || exit 1
-          security list-keychain -d user
-          ls -l $CERTIFICATE_PATH
-          echo
-          security add-certificates -k $KEYCHAIN_PATH ios_distribution.cer
-          security dump-keychain $KEYCHAIN_PATH
-          echo
-
-          # apply provisioning profile
-          echo "apply provisioning profile, step 1"
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles || exit 1
-          echo "apply provisioning profile, step 2"
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles || exit 1
-          echo "apply provisioning profile, step 3: list"
-          ls -l ~/Library/MobileDevice/Provisioning\ Profiles
-          echo
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_PATH"
+          pip3 install cryptography
+          pip3 install pyjwt
+          exp=$(date -v +20M +%s)
+          iss=$(date -v -1M +%s)
+          jwt=$(python3 -c "import jwt; print(jwt.encode({'aud':'appstoreconnect-v1','iss':'$ISSUER_ID','exp':$exp,'iat':$iss},'''$AUTH_KEY''',algorithm='ES256', headers={'kid': '$KEY_ID'}).decode('utf-8'))")
+          echo "::add-mask::$jwt"
+          echo "::set-output name=appStoreToken::$jwt"
+      - name: Prime App Store Connect API
+        env:
+          JWT: ${{ steps.app-store-api-token.outputs.appStoreToken }}
+        uses: nick-invision/retry@v1.0.0
+        with:
+          timeout_minutes: 1
+          max_attempts: 30
+          command: 'curl --header "Authorization: Bearer $JWT" -s -o /dev/null -w "%{http_code}" --fail https://api.appstoreconnect.apple.com/v1/bundleIds'
+      - name: Import Provisioning Profile
+        id: Github provisionining
+        uses: Apple-Actions/download-provisioning-profiles@v1
+        with:
+          bundle-id: maxeem.america.flutter.converter
+          issuer-id: ${{ secrets.APPCONNECT_API_ISSUER }}
+          api-key-id: 223GCBQ6Y3
+          api-private-key: ${{ secrets.APPCONNECT_API_KEY_PRIVATE }}
+          profile-type: IOS_APP_STORE
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-      - run: flutter build ios --no-codesign
-      - run: |
-          echo "check KEYCHAIN_PATH before build: $KEYCHAIN_PATH"
-          ls -l $RUNNER_TEMP/app-signing.keychain-db
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db"
-          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa
-        working-directory: ios
-#        run: flutter build ipa -v --export-options-plist=ios/ExportOptions.plist
+      - run: flutter build ipa -v --export-options-plist=ios/ExportOptions.plist
+#      - run: flutter build ios --no-codesign
+#      - run: |
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive -allowProvisioningUpdates
+#          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa -allowProvisioningUpdates
+#        working-directory: ios
 #      - uses: wzieba/Firebase-Distribution-Github-Action@v1
 #        with:
 #          appId: ${{secrets.FIREBASE_IOS_APPID}}
