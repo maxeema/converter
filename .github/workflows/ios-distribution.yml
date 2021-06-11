@@ -28,7 +28,7 @@ jobs:
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH="$RUNNER_TEMP/4349acc7-3513-4ba7-a980-750fa87dc2be.mobileprovision"
+          PP_PATH="$RUNNER_TEMP/a738cc2a-b796-4359-9c9d-2d4c25cacce0.mobileprovision"
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           
           # prints secrets
@@ -84,7 +84,7 @@ jobs:
           echo "apply provisioning profile, step 3: list"
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
           echo
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_PATH"
+#          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_PATH"
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
@@ -92,7 +92,7 @@ jobs:
       - run: |
           echo "check KEYCHAIN_PATH before build: $KEYCHAIN_PATH"
           ls -l $RUNNER_TEMP/app-signing.keychain-db
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db"
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Debug archive -archivePath build/Runner.xcarchive CODE_SIGN_IDENTITY="Apple Development" PROVISIONING_PROFILE="Automatic" "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db"
           xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa
         working-directory: ios
 #        run: flutter build ipa -v --export-options-plist=ios/ExportOptions.plist
