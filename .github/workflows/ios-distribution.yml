@@ -39,6 +39,8 @@ jobs:
           echo "KEYCHAIN_PASSWORD: $KEYCHAIN_PASSWORD"
           echo
           
+          security add-certificates ios_distribution.cer
+          
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
           echo "CERTIFICATE_PATH: $CERTIFICATE_PATH"
@@ -82,6 +84,7 @@ jobs:
           echo "apply provisioning profile, step 3: list"
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
           echo
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_PATH"
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
@@ -89,7 +92,7 @@ jobs:
       - run: |
           echo "check KEYCHAIN_PATH before build: $KEYCHAIN_PATH"
           ls -l $RUNNER_TEMP/app-signing.keychain-db
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive PROVISIONING_PROFILE="4349acc7-3513-4ba7-a980-750fa87dc2be" CODE_SIGN_IDENTITY="iOS Distribution" "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db"
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db"
           xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa
         working-directory: ios
 #        run: flutter build ipa -v --export-options-plist=ios/ExportOptions.plist
