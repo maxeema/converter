@@ -3,18 +3,19 @@ name: ios distribution CI
 on:
   push:
     tags:
-      - "ios-*"
+      - "ci-ios-*"
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - run: flutter pub get
-      - run: set
-      - run: ls /Applications/
+      - run: |
+          echo "List of applications"
+          ls /Applications/
+      - run: |
+          echo "Dump env variables"
+          set
+          echo
       - name: Select 12.4 Xcode
         run: sudo xcode-select -s /Applications/Xcode_12.4.app
       - name: Install the Apple certificate and provisioning profile
@@ -22,39 +23,74 @@ jobs:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          KEYCHAIN_PASSWORD: 123456
+          #${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-          #
-          set
+          
+          # prints secrets
+          echo
+          echo "BUILD_CERTIFICATE_BASE64: $BUILD_CERTIFICATE_BASE64"
+          echo "P12_PASSWORD: $P12_PASSWORD"
+          echo "BUILD_PROVISION_PROFILE_BASE64: $BUILD_PROVISION_PROFILE_BASE64"
+          echo "KEYCHAIN_PASSWORD: $KEYCHAIN_PASSWORD"
+          echo
+          
+          # dump variables
+#          echo "Dump variables"
+#          set
+#          echo
           
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+          echo "CERTIFICATE_PATH: $CERTIFICATE_PATH"
+          ls -l $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
-
+          echo "PP_PATH: $PP_PATH"
+          ls -l $PP_PATH
+          #
+          #set
+          
           # create temporary keychain
-          security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH
+          echo "create temporary keychain, step 1: $KEYCHAIN_PASSWORD, $KEYCHAIN_PATH"
+          security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH || exit 1
+          ls -l $KEYCHAIN_PATH
+          echo "create temporary keychain, step 2"
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH || exit 1
+          echo "create temporary keychain, step 3"
+          security unlock-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH || exit 1
 
           # import certificate to keychain
-          security import $CERTIFICATE_PATH -P $P12_PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+          echo "import certificate to keychain, step 1"
+          security import $CERTIFICATE_PATH -P $P12_PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH || exit 1
+          ls -l $CERTIFICATE_PATH
+          ls -l $KEYCHAIN_PATH
+          echo "import certificate to keychain, step 2"
+          security list-keychain -d user -s $KEYCHAIN_PATH || exit 1
+          ls -l $CERTIFICATE_PATH
 
           # apply provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "apply provisioning profile, step 1"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles || exit 1
+          echo "apply provisioning profile, step 2"
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles || exit 1
+          echo "apply provisioning profile, step 3: list"
+          ls -l ~/Library/MobileDevice/Provisioning\ Profiles
+          echo
+#      - uses: subosito/flutter-action@v1
+#        with:
+#          channel: 'stable'
+#      - run: flutter pub get
       - name: Build IPA
         run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
-      - uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_IOS_APPID}}
-          token: ${{secrets.FIREBASE_TOKEN}}
-          groups: testers
-          file: build/ios/ipa/converter.ipa
-          releaseNotesFile: RELEASE
+#      - uses: wzieba/Firebase-Distribution-Github-Action@v1
+#        with:
+#          appId: ${{secrets.FIREBASE_IOS_APPID}}
+#          token: ${{secrets.FIREBASE_TOKEN}}
+#          groups: testers
+#          file: build/ios/ipa/converter.ipa
+#          releaseNotesFile: RELEASE
       - run: Great Job, Max!
