@@ -5,15 +5,19 @@
     <key>teamID</key>
     <string>KCKD42NRF8</string>
     <key>method</key>
-    <string>app-store</string>
+    <string>development</string>
+    <key>uploadBitcode</key>
+    <true/>
+    <key>compileBitcode</key>
+    <true/>
     <key>signingStyle</key>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Apple Distribution</string>
+    <string>iPhone Developer: Maksim Shemetov (Y368FCXV4C)</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>Converter GitHub Actions Dist</string>
+     <string>Converter - iOS App Development provisioning</string>
  </dict>
 </dict>
 </plist>
