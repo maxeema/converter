@@ -3,7 +3,7 @@ name: ios distribution CI
 on:
   push:
     tags:
-      - "ios-*"
+      - "ci-ios-*"
 jobs:
   build:
     runs-on: macos-latest
@@ -28,14 +28,25 @@ jobs:
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-          #
-          set
           
+          # prints secrets
+          echo
+          echo $BUILD_CERTIFICATE_BASE64
+          echo $P12_PASSWORD
+          echo $BUILD_PROVISION_PROFILE_BASE64
+          echo $KEYCHAIN_PASSWORD
+          echo
+          
+          # dump variables
+          
+          set
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
 
+          #
+          set
+          
           # create temporary keychain
           security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
