@@ -6,14 +6,13 @@
     <string>KCKD42NRF8</string>
     <key>method</key>
     <string>app-store</string>
-    <key>signingStyle</key>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Apple Distribution</string>
+    <string>iPhone Distribution: Maksim Shemetov (KCKD42NRF8)</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>Converter GitHub Actions Dist</string>
+     <string>iOS Team Store Provisioning Profile: maxeem.america.flutter.converter</string>
  </dict>
 </dict>
 </plist>
