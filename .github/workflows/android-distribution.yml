@@ -3,7 +3,7 @@ name: android distribution CI
 on:
   push:
     tags:
-      - "ci-andriod-*"
+      - "ci-android-*"
 jobs:
   build:
     runs-on: ubuntu-latest
