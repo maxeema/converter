@@ -8,11 +8,11 @@
     <string>app-store</string>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Maksim Shemetov</string>
+    <string>iPhone Distribution: Maksim Shemetov</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>converter - distribution</string>
+     <string>7d5bbec8-5af9-4a64-b3c9-6d9bbedd3b18</string>
     </dict>
 </dict>
 </plist>
