@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>signingStyle</key>
-    <string>manual</string>
+    <string>msanual</string>
     <key>teamID</key>
     <string>KCKD42NRF8</string>
     <key>method</key>
-    <string>app-store</string>
+    <string>aapp-store</string>
     <key>signingCertificate</key>
-    <string>iPhone Distribution: Maksim Shemetov</string>
+    <string>Maksim Shemetov</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
