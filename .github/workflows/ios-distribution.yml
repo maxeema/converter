@@ -19,12 +19,12 @@ jobs:
 #          set
 #          echo
 #      - run: sudo xcode-select -s /Applications/Xcode_12.4.app
-#      - name: Import Codesign Certificate
-#        id: codesign-cert
-#        uses: Apple-Actions/import-codesign-certs@v1
-#        with:
-#          p12-file-base64: ${{ secrets.BAS64P12FILE }}
-#          p12-password: ${{ secrets.P12_PASSWORD }}
+      - name: Import Codesign Certificate
+        id: codesign-cert
+        uses: Apple-Actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.BAS64P12FILE }}
+          p12-password: ${{ secrets.P12_PASSWORD }}
       - name: Generate App Store Connect API Token
         id: app-store-api-token
         env:
