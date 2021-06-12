@@ -5,7 +5,7 @@
     <key>teamID</key>
     <string>KCKD42NRF8</string>
     <key>method</key>
-    <string>app-store</string>
+    <string>development</string>
     <string>manual</string>
     <key>signingCertificate</key>
     <string>Maksim Shemetov (MaxPro)</string>
