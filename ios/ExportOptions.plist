@@ -8,7 +8,7 @@
     <string>development</string>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Maksim Shemetov (MaxPro)</string>
+    <string>iPhone Distribution: Maksim Shemetov (KCKD42NRF8)</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
