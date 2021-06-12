@@ -9,11 +9,11 @@
     <key>signingStyle</key>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Maksim Shemetov</string>
+    <string>iPhone Distribution: Maksim Shemetov</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>Converter - distr</string>
+     <string>245cc7d2-21de-40f0-bfbe-9db6793b986e</string>
     </dict>
 </dict>
 </plist>
