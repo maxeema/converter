@@ -5,14 +5,14 @@
     <key>teamID</key>
     <string>KCKD42NRF8</string>
     <key>method</key>
-    <string>development</string>
+    <string>app-store</string>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Apple Development: Maksim Shemetov</string>
+    <string>Maksim Shemetov</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>pro9</string>
+     <string>converter - distribution</string>
     </dict>
 </dict>
 </plist>
