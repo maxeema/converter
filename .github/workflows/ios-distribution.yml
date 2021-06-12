@@ -23,7 +23,7 @@ jobs:
         id: codesign-cert
         uses: Apple-Actions/import-codesign-certs@v1
         with:
-          p12-file-base64: ${{ secrets.BAS64P12FILE }}
+          p12-file-base64: ${{ secrets.CERTIFICATIONS_P12_BASE64 }}
           p12-password: ${{ secrets.P12_PASSWORD }}
       - name: Generate App Store Connect API Token
         id: app-store-api-token
@@ -55,7 +55,7 @@ jobs:
           issuer-id: ${{ secrets.APPCONNECT_API_ISSUER }}
           api-key-id: 223GCBQ6Y3
           api-private-key: ${{ secrets.APPCONNECT_API_KEY_PRIVATE }}
-          profile-type: IOS_APP_DEVELOPMENT
+          profile-type: IOS_APP_STORE
       - run: security find-identity -v -p codesigning
       - uses: subosito/flutter-action@v1
         with:
