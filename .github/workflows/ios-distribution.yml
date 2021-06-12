@@ -62,8 +62,8 @@ jobs:
       - run: flutter build ios --no-codesign
       - run: |    
           xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive -allowProvisioningUpdates
-#          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa -allowProvisioningUpdates
-#        working-directory: ios
+          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa
+        working-directory: ios
 #      - uses: wzieba/Firebase-Distribution-Github-Action@v1
 #        with:
 #          appId: ${{secrets.FIREBASE_IOS_APPID}}
