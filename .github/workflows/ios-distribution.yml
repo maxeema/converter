@@ -55,7 +55,7 @@ jobs:
           issuer-id: ${{ secrets.APPCONNECT_API_ISSUER }}
           api-key-id: 223GCBQ6Y3
           api-private-key: ${{ secrets.APPCONNECT_API_KEY_PRIVATE }}
-          profile-type: IOS_APP_STORE
+          profile-type: IOS_APP_DEVELOPMENT
       - run: security find-identity -v -p codesigning
       - uses: subosito/flutter-action@v1
         with:
