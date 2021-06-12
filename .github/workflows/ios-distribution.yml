@@ -63,7 +63,7 @@ jobs:
 #      - run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
       - run: flutter build ios --no-codesign
       - run: |
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive -exportProvisioningProfile "iOS Team Store Provisioning Profile: maxeem.america.flutter.converter"
+          xcodebuild -workspace Runner.xcworkspace archive -archivePath build/Runner.xcarchive
           xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportPath build/myApp.ipa -exportFormat ipa -exportProvisioningProfile "iOS Team Store Provisioning Profile: maxeem.america.flutter.converter"
 #          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive -allowProvisioningUpdates
 #          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa -allowProvisioningUpdates
