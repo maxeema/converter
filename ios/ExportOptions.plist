@@ -8,11 +8,11 @@
     <string>app-store</string>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>iPhone Distribution: Maksim Shemetov (KCKD42NRF8)</string>
+    <string>iPhone Distribution: Maksim Shemetov</string>
     <key>provisioningProfiles</key>
     <dict>
      <key>maxeem.america.flutter.converter</key>
-     <string>iOS Team Store Provisioning Profile: maxeem.america.flutter.converter</string>
+     <string>Converter GitHub Actions Dist</string>
  </dict>
 </dict>
 </plist>
