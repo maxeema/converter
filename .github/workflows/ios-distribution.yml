@@ -5,7 +5,7 @@ on:
     tags:
       - "ci-ios-*"
 jobs:
-  build:
+  build-ios:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
@@ -14,17 +14,18 @@ jobs:
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.CERTIFICATIONS_P12_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.PROVISIONING_DEV }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.PROVISIONING_DISTR_2 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          PP_PATH=$RUNNER_TEMP/pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
+          ls -l $PP_PATH
 
           # create temporary keychain
           security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_PATH
@@ -38,24 +39,36 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-      - run: security find-identity -v -p codesigning
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-      - run: flutter build ipa --export-options-plist=ios/ExportOptions.plist
-#      - run: flutter build ios --no-codesign
-#      - run: |
-#          cd ios
-#          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-#          echo "Use KEYCHAIN_PATH: $KEYCHAIN_PATH"
-#          xcodebuild -workspace Runner.xcworkspace -scheme Runner -sdk iphoneos -configuration Release archive -archivePath build/Runner.xcarchive OTHER_CODE_SIGN_FLAGS='--keychain=$KEYCHAIN_PATH' CODE_SIGN_IDENTITY=1DBC5B3CFCAC5AC1448B3A95EB8402B384E026AA
-#          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/Runner.ipa
-#        working-directory: ios
-#      - uses: wzieba/Firebase-Distribution-Github-Action@v1
-#        with:
-#          appId: ${{secrets.FIREBASE_IOS_APPID}}
-#          token: ${{secrets.FIREBASE_TOKEN}}
-#          groups: testers
-#          file: build/ios/ipa/converter.ipa
-#          releaseNotesFile: RELEASE
-      - run: Great Job, Max!
+      - run: |
+          flutter build ipa --export-options-plist=ios/ExportOptions.plist
+          ls -l build/ios/ipa
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact-ios
+          path: build/ios/ipa/converter.ipa
+
+  upload-ios:
+    needs: build-ios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact-ios
+      - run: ls -l .
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_IOS_APPID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers-ios
+          file: converter.ipa
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: artifact-ios
+      - run: echo "Great Job, Max!"
