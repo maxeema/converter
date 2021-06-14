@@ -1,3 +1,5 @@
+0.6.10+10
+- migrated to use development provisioning profile with specified devices
 0.6.9+9
 - configured iOS CI for Firebase App Distribution
 0.6.8+8
