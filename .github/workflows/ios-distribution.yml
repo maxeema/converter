@@ -45,20 +45,29 @@ jobs:
       - run: |
           flutter build ipa --export-options-plist=ios/ExportOptions.plist
           ls -l build/ios/ipa
-      - name: Upload artifact
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v2
         with:
-          name: artifact-ios
+          name: artifact-ipa
           path: build/ios/ipa/converter.ipa
+      - name: Upload RELEASE notes artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact-release-notes
+          path: RELEASE
 
   upload-ios:
     needs: build-ios
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
+      - name: Download IPA artifact
         uses: actions/download-artifact@v2
         with:
-          name: artifact-ios
+          name: artifact-ipa
+      - name: Download RELEASE notes artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact-release-notes
       - run: ls -l .
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -68,8 +77,12 @@ jobs:
           groups: testers-ios
           file: converter.ipa
           releaseNotesFile: RELEASE
-      - name: Delete artifact
+      - name: Delete ipa artifact
         uses: geekyeggo/delete-artifact@v1
         with:
-          name: artifact-ios
+          name: artifact-ipa
+      - name: Delete RELEASE notes artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: artifact-release-notes
       - run: echo "Great Job, Max!"
