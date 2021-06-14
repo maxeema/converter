@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store</string>
+    <string>development</string>
     <key>provisioningProfiles</key>
     <dict>
       <key>maxeem.america.flutter.converter</key>
-      <string>Converter - distr 2</string>
+      <string>Converter - dev all</string>
     </dict>
 </dict>
 </plist>
