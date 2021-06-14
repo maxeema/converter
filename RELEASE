@@ -1,3 +1,5 @@
+0.6.9+9
+- configured iOS CI for Firebase App Distribution
 0.6.8+8
 - transformed main CI to Android only
 
