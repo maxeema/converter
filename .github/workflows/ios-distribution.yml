@@ -67,6 +67,7 @@ jobs:
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: testers-ios
           file: converter.ipa
+          releaseNotesFile: RELEASE
       - name: Delete artifact
         uses: geekyeggo/delete-artifact@v1
         with:
