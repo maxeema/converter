@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>method</key>
-    <string>development</string>
-    <key>provisioningProfiles</key>
-    <dict>
-      <key>maxeem.america.flutter.converter</key>
-      <string>Converter - dev all</string>
-    </dict>
+	<key>method</key>
+	<string>app-store</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>maxeem.america.flutter.converter</key>
+		<string>App Store - all</string>
+	</dict>
 </dict>
 </plist>
