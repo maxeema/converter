@@ -1,8 +1,8 @@
 name: converter
 description: Converter is a unit converter app written on Flutter
-version: 0.6.10+10
+version: 0.6.11+11
 authors:
-  - Max Shemetov <imax.shemetov@gmail.com>
+  - Max Shemetov <shemetov.career@gmail.com>
 repository: https://github.com/maxeema/converter
 publish_to: 'none'
 
