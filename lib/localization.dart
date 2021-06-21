@@ -31,7 +31,7 @@ class AppLocalizations {
 
   static Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      'title': 'Converter',
+      'title': 'Flutter Converter',
       'conversion': 'Conversion',
       'enterValue': 'Enter value',
       'incorrectInput': 'Incorrect input',
